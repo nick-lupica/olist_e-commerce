@@ -1,0 +1,20 @@
+#MacOS
+.DS_Store
+._DS_Store
+
+# Windows
+desktop.ini
+
+# pycharm
+.vs/
+.idea/
+.vscode/
+.venv/
+
+#environment
+.env
+
+#jupyter
+.ipynb_checkpoints/
+
+src/__pycache__
