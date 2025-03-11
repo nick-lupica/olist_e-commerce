@@ -1,4 +1,4 @@
-from src.common import readfile
+from src.common import readfile, caricamento_percentuale
 import psycopg
 import os
 from dotenv import load_dotenv
@@ -45,8 +45,8 @@ def load(df):
             VALUES (%s, %s, %s, %s);
             """
 
-            for indx, row in df.iterrows():
-                cur.execute(sql, row.to_list())
+            caricamento_percentuale(df, cur, sql)
+
 
             conn.commit()
 
