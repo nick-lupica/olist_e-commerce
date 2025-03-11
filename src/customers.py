@@ -1,4 +1,4 @@
-from src.common import readfile, caricamento_percentuale
+from src.common import readfile, caricamento_barra
 import psycopg
 import os
 from dotenv import load_dotenv
@@ -21,13 +21,12 @@ def transform(df):
 
 def load(df):
     print("Questo è il metodo load dei clienti")
-    print(df)
     with psycopg.connect(host=host, dbname=dbname, user=user, password=password, port=port) as conn:
         with conn.cursor() as cur:
             # cur execute
 
             sql = """
-            CREATE TABLE IF NOT EXISTS customers (
+            CREATE TABLE customers (
             pk_customer VARCHAR PRIMARY KEY,
             region VARCHAR,
             city VARCHAR,
@@ -35,18 +34,34 @@ def load(df):
             );
             """
 
-            cur.execute(sql)
+            try:
+                cur.execute(sql)
+            except psycopg.errors.DuplicateTable as ex:
+                conn.commit()
+                print(ex)
+                domanda = input("Vuoi cancellare la tabella? Si/No\n ").strip()
+                if domanda == "Si":
+                    #eliminare tabella
+                    sql_delete = """
+                    DROP TABLE customers
+                    """
+                    cur.execute(sql_delete)
+                    print("Tabella customers eliminata.")
+                    conn.commit()
+                    print("Ricreo la tabella customers.")
+                    cur.execute(sql)
+
+
 
             # Inserimento report nel database
 
             sql = """
             INSERT INTO customers
             (pk_customer, region, city, cap)
-            VALUES (%s, %s, %s, %s);
+            VALUES (%s, %s, %s, %s) ON CONFLICT DO NOTHING;
             """
 
-            caricamento_percentuale(df, cur, sql)
-
+            caricamento_barra(df, cur, sql)
 
             conn.commit()
 
