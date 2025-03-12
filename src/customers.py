@@ -20,6 +20,7 @@ def transform(df):
     df = common.drop_duplicates(df)
     df = common.check_nulls(df)
     df = common.format_cap(df)
+    common.save_processed(df)
     print(df)
     return df
 

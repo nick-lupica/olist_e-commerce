@@ -1,4 +1,5 @@
 import datetime
+import os
 
 import pandas as pd
 
@@ -49,13 +50,17 @@ def check_nulls(df):
 
 def save_processed(df):
     name = input("Inserisci nome del file ").strip().lower()
-    file_name = name + "_processed" + "_datetime" + str(datetime.datetime.now())
+    timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+    file_name = name + "_processed" + "_datetime" + timestamp + ".csv"
     print(file_name)
-    if name not in data.processed:
-        df.to_csv("../data/processed/" + file_name, index = False)
-        print(f"file salvato in {file_name}.csv")
+    if __name__ == "__main__":
+        directory_name = "../data/processed/"
+    else:
+        directory_name = "data/processed/"
+    df.to_csv(directory_name + file_name, index=False)
+
 
 
 if __name__ == "__main__":
-    #readfile()
-    save_processed([])
+    df = readfile()
+    save_processed(df)
