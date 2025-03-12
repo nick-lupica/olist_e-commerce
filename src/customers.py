@@ -1,4 +1,4 @@
-from src.common import readfile, caricamento_barra
+import src.common as common
 import psycopg
 import os
 from dotenv import load_dotenv
@@ -12,11 +12,15 @@ port = os.getenv("port")
 
 def extract():
     print("Questo è il metodo extract dei clienti")
-    df = readfile()
+    df = common.readfile()
     return df
 
 def transform(df):
     print("Questo è il metodo transform dei clienti")
+    df = common.drop_duplicates(df)
+    df = common.check_nulls(df)
+    df = common.format_cap(df)
+    print(df)
     return df
 
 def load(df):
@@ -39,8 +43,8 @@ def load(df):
             except psycopg.errors.DuplicateTable as ex:
                 conn.commit()
                 print(ex)
-                domanda = input("Vuoi cancellare la tabella? Si/No\n ").strip()
-                if domanda == "Si":
+                domanda = input("Vuoi cancellare la tabella? Si/No\n ").strip().upper()
+                if domanda == "SI":
                     #eliminare tabella
                     sql_delete = """
                     DROP TABLE customers
@@ -61,7 +65,7 @@ def load(df):
             VALUES (%s, %s, %s, %s) ON CONFLICT DO NOTHING;
             """
 
-            caricamento_barra(df, cur, sql)
+            common.caricamento_barra(df, cur, sql)
 
             conn.commit()
 

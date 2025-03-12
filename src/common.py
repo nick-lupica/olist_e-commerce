@@ -1,10 +1,11 @@
+import datetime
+
 import pandas as pd
 
-
 def readfile():
-    isValid = False
+    is_valid = False
     df = pd.DataFrame()
-    while not isValid:
+    while not is_valid:
         path = input("Inserire il path del file:\n").strip()
         try:
             df = pd.read_csv(path)
@@ -14,7 +15,7 @@ def readfile():
             print(ex)
         else:
             print("Path inserito correttamente")
-            isValid = True
+            is_valid = True
     else:
         return df
 
@@ -33,5 +34,28 @@ def caricamento_barra(df,cur,sql):
     print("│ 100% Completato!")
     print("└──────────────────────────────────────────────────┘")
 
+def format_cap(df):
+    df["cap"] = df["cap"].astype(str).str.zfill(5)
+    return df
+
+def drop_duplicates(df):
+    print("Valori duplicati rimossi:\n", df.duplicated().sum(), "\n")
+    df.drop_duplicates(inplace = True)
+    return df
+
+def check_nulls(df):
+    print("Valori nulli per colonna:\n", df.isnull().sum(), "\n")
+    return df
+
+def save_processed(df):
+    name = input("Inserisci nome del file ").strip().lower()
+    file_name = name + "_processed" + "_datetime" + str(datetime.datetime.now())
+    print(file_name)
+    if name not in data.processed:
+        df.to_csv("../data/processed/" + file_name, index = False)
+        print(f"file salvato in {file_name}.csv")
+
+
 if __name__ == "__main__":
-    readfile()
+    #readfile()
+    save_processed([])
