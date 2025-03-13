@@ -40,7 +40,7 @@ def format_string(df, cols):
         df[col] = df[col].str.strip("./_ ")
         df[col] = df[col].str.replace("[0-9]", "", regex=True)
         df[col] = df[col].str.replace("[$&+:;=?@#|<>.^*()%!]", "", regex=True)
-       # df[col] = df[col].str.replace("[ ]", "", regex=True)
+        df[col] = df[col].str.replace("  ", " ")
     return df
 
 def format_cap(df):
