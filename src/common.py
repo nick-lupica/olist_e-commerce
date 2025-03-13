@@ -34,6 +34,14 @@ def caricamento_barra(df,cur,sql):
         cur.execute(sql, row.to_list())
     print("│ 100% Completato!")
     print("└──────────────────────────────────────────────────┘")
+def format_string(df, cols):
+    print(df[cols])
+    for col in cols:
+        df[col] = df[col].str.strip("./_ ")
+        df[col] = df[col].str.replace("[0-9]", "", regex=True)
+        df[col] = df[col].str.replace("[$&+:;=?@#|<>.^*()%!]", "", regex=True)
+       # df[col] = df[col].str.replace("[ ]", "", regex=True)
+    return df
 
 def format_cap(df):
     df["cap"] = df["cap"].astype(str).str.zfill(5)
@@ -47,8 +55,13 @@ def drop_duplicates(df):
 def check_nulls(df, subset = ""):
     print(f"Valori nulli per colonna:\n {df.isnull().sum()} \n")
     subset = df.columns.tolist()[0] if not subset else subset
-    df.dropna(subset=subset, inplace = True, ignore_index = True)
+    df.dropna(subset=subset, inplace=True, ignore_index=True)
+    #df = fill_nulls(df)
     print(df)
+    return df
+
+def fill_nulls(df):
+    df.fillna(value="nd", axis=0, inplace=True)
     return df
 
 def save_processed(df):
@@ -66,5 +79,7 @@ def save_processed(df):
 
 if __name__ == "__main__":
     df = readfile()
-    check_nulls(df)
+    df = format_string(df, ["region", "city"])
+    print(df)
+    #check_nulls(df)
     #save_processed(df)
