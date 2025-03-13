@@ -44,8 +44,11 @@ def drop_duplicates(df):
     df.drop_duplicates(inplace = True)
     return df
 
-def check_nulls(df):
-    print("Valori nulli per colonna:\n", df.isnull().sum(), "\n")
+def check_nulls(df, subset = ""):
+    print(f"Valori nulli per colonna:\n {df.isnull().sum()} \n")
+    subset = df.columns.tolist()[0] if not subset else subset
+    df.dropna(subset=subset, inplace = True, ignore_index = True)
+    print(df)
     return df
 
 def save_processed(df):
@@ -63,4 +66,5 @@ def save_processed(df):
 
 if __name__ == "__main__":
     df = readfile()
-    save_processed(df)
+    check_nulls(df)
+    #save_processed(df)

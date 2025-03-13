@@ -18,7 +18,7 @@ def extract():
 def transform(df):
     print("Questo è il metodo transform dei clienti")
     df = common.drop_duplicates(df)
-    df = common.check_nulls(df)
+    df = common.check_nulls(df, ["customer_id"])
     df = common.format_cap(df)
     common.save_processed(df)
     print(df)
