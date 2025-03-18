@@ -2,6 +2,7 @@ import src.common as common
 import psycopg
 import os
 from dotenv import load_dotenv
+import datetime
 
 load_dotenv()
 host = os.getenv("host")
@@ -25,6 +26,7 @@ def transform(df):
     return df
 
 def load(df):
+    df["last_updated"] = datetime.datetime.now().isoformat(sep=" ", timespec="seconds")
     print("Questo è il metodo load dei clienti")
     with psycopg.connect(host=host,
                          dbname=dbname,
@@ -39,7 +41,8 @@ def load(df):
             pk_customer VARCHAR PRIMARY KEY,
             region VARCHAR,
             city VARCHAR,
-            cap VARCHAR
+            cap VARCHAR,
+            last_updated TIMESTAMP
             );
             """
 
@@ -60,14 +63,13 @@ def load(df):
                     print("Ricreo la tabella customers.")
                     cur.execute(sql)
 
-
-
             # Inserimento report nel database
 
             sql = """
             INSERT INTO customers
-            (pk_customer, region, city, cap)
-            VALUES (%s, %s, %s, %s) ON CONFLICT DO NOTHING;
+            (pk_customer, region, city, cap, last_updated)
+            VALUES (%s, %s, %s, %s, %s) ON CONFLICT (pk_customer) DO UPDATE SET
+            (region, city, cap, last_updated) = (EXCLUDED.region, EXCLUDED.city, EXCLUDED.cap, EXCLUDED.last_updated);
             """
 
             common.caricamento_barra(df, cur, sql)
@@ -83,24 +85,25 @@ def complete_city_region():
 
         with conn.cursor() as cur:
             sql = """
-            SELECT *
-            FROM customers
-            WHERE city = 'NaN' OR 'region' = 'NaN';
-            """
+                SELECT *
+                FROM customers
+                WHERE city = 'NaN' OR 'region' = 'NaN';
+                """
             cur.execute(sql)
 
-            sql = """
-            UPDATE customers c1
-            SET region = c2.region
-            FROM customers c2
-            WHERE c1.cap = c2.cap 
-            AND c1.cap <> 'NaN'
-            AND c2.cap <> 'NaN'
-            AND c1.region = 'NaN'
-            AND c2.region <> 'NaN'
-            RETURNING *
-            ;
-            """
+            sql = f"""
+                UPDATE customers c1
+                SET region = c2.region,
+                last_updated = '{datetime.datetime.now().isoformat(sep=" ", timespec="seconds")}'
+                FROM customers c2
+                WHERE c1.cap = c2.cap 
+                AND c1.cap <> 'NaN'
+                AND c2.cap <> 'NaN'
+                AND c1.region = 'NaN'
+                AND c2.region <> 'NaN'
+                RETURNING *
+                ;
+                """
 
             cur.execute(sql)
 
@@ -108,18 +111,19 @@ def complete_city_region():
             for record in cur:
                 print(record)
 
-            sql = """
-            UPDATE customers c1
-            SET city = c2.city
-            FROM customers c2
-            WHERE c1.cap = c2.cap 
-            AND c1.cap <> 'NaN'
-            AND c2.cap <> 'NaN'
-            AND c1.city = 'NaN'
-            AND c2.city <> 'NaN'
-            RETURNING *
-            ;
-            """
+            sql = f"""
+                UPDATE customers c1
+                SET city = c2.city,
+                last_updated = '{datetime.datetime.now().isoformat(sep=" ", timespec="seconds")}'
+                FROM customers c2
+                WHERE c1.cap = c2.cap 
+                AND c1.cap <> 'NaN'
+                AND c2.cap <> 'NaN'
+                AND c1.city = 'NaN'
+                AND c2.city <> 'NaN'
+                RETURNING *
+                ;
+                """
 
             cur.execute(sql)
 

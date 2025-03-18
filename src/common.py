@@ -18,7 +18,15 @@ def readfile():
     while not is_valid:
         path = input("Inserire il path del file:\n").strip()
         try:
-            df = pd.read_csv(path)
+            path_list = path.split(".")
+
+            if path_list[-1] == "csv" or path_list[-1] == "txt":
+                df = pd.read_csv(path)
+            elif path_list[-1] == "xlsx" or path_list[-1] == "xls" :
+                df = pd.read_excel(path)
+            else:
+                df = pd.read_json(path)
+
         except FileNotFoundError as ex:
             print(ex)
         except OSError as ex:
