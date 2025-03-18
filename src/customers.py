@@ -19,14 +19,18 @@ def transform(df):
     print("Questo è il metodo transform dei clienti")
     df = common.drop_duplicates(df)
     df = common.check_nulls(df, ["customer_id"])
+    df = common.format_string(df, ["region", "city"])
     df = common.format_cap(df)
-    common.save_processed(df)
-    print(df)
+    #common.save_processed(df)
     return df
 
 def load(df):
     print("Questo è il metodo load dei clienti")
-    with psycopg.connect(host=host, dbname=dbname, user=user, password=password, port=port) as conn:
+    with psycopg.connect(host=host,
+                         dbname=dbname,
+                         user=user,
+                         password=password,
+                         port=port) as conn:
         with conn.cursor() as cur:
             # cur execute
 
@@ -70,11 +74,66 @@ def load(df):
 
             conn.commit()
 
+def complete_city_region():
+    with psycopg.connect(host = host,
+                         dbname = dbname,
+                         user = user,
+                         password = password,
+                         port = port) as conn:
+
+        with conn.cursor() as cur:
+            sql = """
+            SELECT *
+            FROM customers
+            WHERE city = 'NaN' OR 'region' = 'NaN';
+            """
+            cur.execute(sql)
+
+            sql = """
+            UPDATE customers c1
+            SET region = c2.region
+            FROM customers c2
+            WHERE c1.cap = c2.cap 
+            AND c1.cap <> 'NaN'
+            AND c2.cap <> 'NaN'
+            AND c1.region = 'NaN'
+            AND c2.region <> 'NaN'
+            RETURNING *
+            ;
+            """
+
+            cur.execute(sql)
+
+            print("record con regione aggiornata")
+            for record in cur:
+                print(record)
+
+            sql = """
+            UPDATE customers c1
+            SET city = c2.city
+            FROM customers c2
+            WHERE c1.cap = c2.cap 
+            AND c1.cap <> 'NaN'
+            AND c2.cap <> 'NaN'
+            AND c1.city = 'NaN'
+            AND c2.city <> 'NaN'
+            RETURNING *
+            ;
+            """
+
+            cur.execute(sql)
+
+            print("record con city aggiornata")
+            for record in cur:
+                print(record)
+
 
 def main():
     print("Questo è il metodo main dei clienti")
     df = extract()
     df = transform(df)
+    print("dati traformati")
+    print(df)
     load(df)
 
 
