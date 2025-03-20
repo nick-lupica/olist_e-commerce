@@ -33,33 +33,20 @@ def load(df):
         with conn.cursor() as cur:
 
             sql = """
-                CREATE TABLE orders (
+                CREATE TABLE IF NOT EXISTS orders (
                 pk_order VARCHAR PRIMARY KEY,
                 fk_customer VARCHAR,
                 status VARCHAR,
                 purchase_timestamp TIMESTAMP,
                 delivered_timestamp TIMESTAMP,
                 estimated_date DATE,
-                last_updated TIMESTAMP
+                last_updated TIMESTAMP,
+                FOREIGN KEY (fk_customer) REFERENCES customers (pk_customer) 
                 );
                 """
 
-            try:
-                cur.execute(sql)
-            except psycopg.errors.DuplicateTable as ex:
-                conn.commit()
-                print(ex)
-                domanda = input("Vuoi cancellare la tabella? Si/No\n ").strip().upper()
-                if domanda == "SI":
-                    # eliminare tabella
-                    sql_delete = """
-                    DROP TABLE orders
-                    """
-                    cur.execute(sql_delete)
-                    print("Tabella orders eliminata.")
-                    conn.commit()
-                    print("Ricreo la tabella orders.")
-                    cur.execute(sql)
+            cur.execute(sql)
+
 
             sql = """
             INSERT INTO orders

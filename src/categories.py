@@ -155,7 +155,8 @@ def transform(df, column):
                                    , "photography & video", df["category_name"])
 
     df["category_name"] = df["category_name"].fillna("other")  # Imposta 'other' per i valori non mappati
-
+    df["category_name"] = np.where((df[f"{column}"] == ""), "other",
+                                   df["category_name"])
 
 
 
