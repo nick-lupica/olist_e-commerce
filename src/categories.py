@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import numpy as np
 import pandas as pd
 
+
 load_dotenv()
 host = os.getenv("host")
 dbname = os.getenv("dbname")
@@ -17,21 +18,14 @@ def extract():
     df = common.readfile()
     return df
 
-def transform(df):
-    print("Questo è il metodo transform delle categorie")
-    df = common.drop_duplicates(df)
-    df = common.check_nulls(df, ["product_category_name_english", "product_category_name_italian"])
-
-    return df
-
 
 def load_new_column(df):
     df["category_name"] = None
     df["category_name"] = np.where(df["product_category_name_english"] == "health_beauty", "beauty",
                                    df["category_name"])
-    df["category_name"] = np.where(df["product_category_name_english"] == "computers_accessories", "informatica",
+    df["category_name"] = np.where(df["product_category_name_english"] == "computers_accessories", "it accessories",
                                    df["category_name"])
-    df["category_name"] = np.where(df["product_category_name_english"] == "auto", "automobili", df["category_name"])
+    df["category_name"] = np.where(df["product_category_name_english"] == "auto", "automotive", df["category_name"])
 
     df["category_name"] = np.where((df["product_category_name_english"] == "bed_bath_table") |
                                    (df["product_category_name_english"] == "housewares") |
@@ -39,31 +33,31 @@ def load_new_column(df):
                                    (df["product_category_name_english"] == "home_confort") |
                                    (df["product_category_name_english"] == "home_comfort_2") |
                                    (df["product_category_name_english"] == "la_cuisine")
-                                   , "casalinghi", df["category_name"])
+                                   , "home & kitchen", df["category_name"])
 
     df["category_name"] = np.where((df["product_category_name_english"] == "furniture_decor") |
                                    (df["product_category_name_english"] == "kitchen_dining_laundry_garden_furniture") |
                                    (df["product_category_name_english"] == "furniture_mattress_and_upholstery") |
                                    (df["product_category_name_english"] == "furniture_living_room") |
                                    (df["product_category_name_english"] == "furniture_bedroom")
-                                   , "arredamento", df["category_name"])
+                                   , "furniture & decor", df["category_name"])
 
     df["category_name"] = np.where((df["product_category_name_english"] == "sports_leisure") |
                                    (df["product_category_name_english"] == "fashion_sport")
                                    , "sport", df["category_name"])
 
     df["category_name"] = np.where((df["product_category_name_english"] == "perfumery")
-                                   , "profumeria", df["category_name"])
+                                   , "perfumes", df["category_name"])
 
     df["category_name"] = np.where((df["product_category_name_english"] == "telephony") |
                                    (df["product_category_name_english"] == "")
-                                   , "smartphone", df["category_name"])
+                                   , "smartphones", df["category_name"])
 
     df["category_name"] = np.where((df["product_category_name_english"] == "watches_gifts") |
                                    (df["product_category_name_english"] == "fashion_bags_accessories") |
                                    (df["product_category_name_english"] == "fashion_shoes") |
                                    (df["product_category_name_english"] == "luggage_accessories")
-                                   , "accessori", df["category_name"])
+                                   , "accessories", df["category_name"])
 
     df["category_name"] = np.where((df["product_category_name_english"] == "food_drink") |
                                    (df["product_category_name_english"] == "food") |
@@ -75,14 +69,14 @@ def load_new_column(df):
                                    , "baby", df["category_name"])
 
     df["category_name"] = np.where((df["product_category_name_english"] == "stationery")
-                                   , "cartoleria", df["category_name"])
+                                   , "stationery", df["category_name"])
 
     df["category_name"] = np.where((df["product_category_name_english"] == "tablets_printing_image") |
                                    (df["product_category_name_english"] == "office_furniture")
-                                   , "ufficio", df["category_name"])
+                                   , "office", df["category_name"])
 
     df["category_name"] = np.where((df["product_category_name_english"] == "toys")
-                                   , "giocattoli", df["category_name"])
+                                   , "toys", df["category_name"])
 
     df["category_name"] = np.where((df["product_category_name_english"] == "garden_tools") |
                                    (df["product_category_name_english"] == "costruction_tools_garden") |
@@ -94,37 +88,38 @@ def load_new_column(df):
                                    (df["product_category_name_english"] == "security_and_services") |
                                    (df["product_category_name_english"] == "signaling_and_security") |
                                    (df["product_category_name_english"] == "flowers")
-                                   , "edilizia e giardino", df["category_name"])
+                                   , "home improvement & garden", df["category_name"])
 
     df["category_name"] = np.where((df["product_category_name_english"] == "small_appliances") |
                                    (df["product_category_name_english"] == "small_appliances_home_oven_and_coffee")
-                                   , "piccoli elettrodomestici", df["category_name"])
+                                   , "small appliances", df["category_name"])
 
     df["category_name"] = np.where((df["product_category_name_english"] == "fashion_male_clothing") |
                                    (df["product_category_name_english"] == "fashio_female_clothing") |
                                    (df["product_category_name_english"] == "fashion_underwear_beach") |
                                    (df["product_category_name_english"] == "fashion_childrens_clothes")
-                                   , "abbigliamento", df["category_name"])
+                                   , "fashion", df["category_name"])
 
-    df["category_name"] = np.where((df["product_category_name_english"] == "consoles_games")
-                                   , "videogiochi", df["category_name"])
+    df["category_name"] = np.where((df["product_category_name_english"] == "consoles_games") |
+                                   (df["product_category_name_english"] == "pc_gamer")
+                                   , "video games & consoles", df["category_name"])
 
     df["category_name"] = np.where((df["product_category_name_english"] == "audio")
                                    , "audio", df["category_name"])
 
     df["category_name"] = np.where((df["product_category_name_english"] == "cool_stuff")
-                                   , "idee regalo", df["category_name"])
+                                   , "gift ideas", df["category_name"])
 
     df["category_name"] = np.where((df["product_category_name_english"] == "air_conditioning") |
                                    (df["product_category_name_english"] == "home_appliances") |
                                    (df["product_category_name_english"] == "home_appliances_2")
-                                   , "grandi elettrodomestici", df["category_name"])
+                                   , "home appliances", df["category_name"])
 
     df["category_name"] = np.where((df["product_category_name_english"] == "pet_shop")
-                                   , "animali", df["category_name"])
+                                   , "pet", df["category_name"])
 
     df["category_name"] = np.where((df["product_category_name_english"] == "market_place")
-                                   , "usato", df["category_name"])
+                                   , "used", df["category_name"])
 
     df["category_name"] = np.where((df["product_category_name_english"] == "electronics") |
                                    (df["product_category_name_english"] == "art") |
@@ -137,17 +132,17 @@ def load_new_column(df):
 
     df["category_name"] = np.where((df["product_category_name_english"] == "agro_industry_and_commerce") |
                                    (df["product_category_name_english"] == "industry_commerce_and_business")
-                                   , "commercio", df["category_name"])
+                                   , "commerce", df["category_name"])
 
     df["category_name"] = np.where((df["product_category_name_english"] == "books_technical") |
                                    (df["product_category_name_english"] == "books_imported") |
                                    (df["product_category_name_english"] == "books_general_interest")
-                                   , "libri", df["category_name"])
+                                   , "books", df["category_name"])
 
     df["category_name"] = np.where((df["product_category_name_english"] == "musical_instruments") |
                                    (df["product_category_name_english"] == "music") |
                                    (df["product_category_name_english"] == "cds_dvds_musicals")
-                                   , "musica", df["category_name"])
+                                   , "music", df["category_name"])
 
     df["category_name"] = np.where((df["product_category_name_english"] == "computers")
                                    , "computer", df["category_name"])
@@ -156,7 +151,15 @@ def load_new_column(df):
                                    , "dvd blu-ray", df["category_name"])
 
     df["category_name"] = np.where((df["product_category_name_english"] == "cine_photo")
-                                   , "fotografia e video", df["category_name"])
+                                   , "photography & video", df["category_name"])
+
+
+    df["category_name"] = df["category_name"].fillna("other")  # Imposta 'other' per i valori non mappati
+
+    # **Aggiunge "other" manualmente come categoria se non esiste già**
+    if "other" not in df["category_name"].unique():
+        df = pd.concat([df, pd.DataFrame([{"category_name": "other"}])], ignore_index=True)
+
     return df
 
 def load(df):
@@ -170,15 +173,33 @@ def load(df):
         with conn.cursor() as cur:
 
             sql = """
-            CREATE TABLE IF NOT EXISTS categories(
+            CREATE TABLE categories(
             pk_category SERIAL PRIMARY KEY,
-            category VARCHAR
+            category VARCHAR UNIQUE
             );
             """
 
-            cur.execute(sql)
+            try:
+                cur.execute(sql)
+            except psycopg.errors.DuplicateTable as ex:
+                conn.commit()
+                print(ex)
+                domanda = input("Vuoi cancellare la tabella? Si/No\n ").strip().upper()
+                if domanda == "SI":
+                    # eliminare tabella
+                    sql_delete = """
+                    DROP TABLE categories
+                    """
+                    cur.execute(sql_delete)
+                    print("Tabella categories eliminata.")
+                    conn.commit()
+                    print("Ricreo la tabella categories.")
+                    cur.execute(sql)
 
-            sql = "INSERT INTO categories (category) VALUES (%s);"
+            sql = """INSERT INTO categories 
+            (category) 
+            VALUES (%s) ON CONFLICT (category) DO NOTHING;
+            """
 
             print(f"Caricamento in corso... {str(len(df))} righe da inserire.")
             print("Rimossi valori di category doppioni\n")
@@ -189,12 +210,12 @@ def load(df):
                 cur.execute(sql, (category,))
 
 
+
             conn.commit()
 
 def main():
     print("Questo è il metodo main delle categorie")
     df = extract()
-    df = transform(df)
     print("dati traformati")
     print(df)
     df = load_new_column(df)

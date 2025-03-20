@@ -107,7 +107,7 @@ def format_region():
 
             sql = f"""
             UPDATE {nome_tabella}
-            SET region = 'Friuli-VeneziaGiulia'
+            SET region = 'Friuli-Venezia Giulia'
             WHERE region = 'Friuli Venezia Giulia'
             RETURNING *            
             """
@@ -119,7 +119,7 @@ def format_region():
 
             sql = f"""
             UPDATE {nome_tabella}
-            SET region = 'Trentino-Alto-Adige'
+            SET region = 'Trentino-Alto Adige'
             WHERE region = 'Trentino Alto Adige'
             RETURNING *            
             """
@@ -128,19 +128,6 @@ def format_region():
             print("record con regione aggiornata")
             for record in cur:
                 print(record)
-
-            sql = f"""
-            UPDATE {nome_tabella}
-            SET region = 'Valle d''Aosta'
-            WHERE region = 'Valled''Aosta'
-            RETURNING *            
-            """
-
-            cur.execute(sql)
-            print("record con regione aggiornata")
-            for record in cur:
-                print(record)
-
 
 
 def save_processed(df):
