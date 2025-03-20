@@ -1,6 +1,5 @@
 import src.customers as customers
 import src.categories as categories
-import src.products as products
 import src.orders as orders
 import src.common as common
 
@@ -33,6 +32,7 @@ if __name__ == "__main__":
             else:
                 risposta = "0"
 
+
         if domanda_iniziale == "2":
             risposta = input("""Che cosa vuoi fare con la tabella categories?
             1. Esegui ETL dei categories
@@ -40,12 +40,13 @@ if __name__ == "__main__":
             """)
             if risposta == "1":
                 df_categories = categories.extract()
-                df_categories = categories.load_new_column(df_categories)
+                df_categories = categories.load_categories(df_categories)
                 categories.load(df_categories)
             else:
                 risposta = "0"
 
-
+        if domanda_iniziale == "0":
+            risposta = "0"
 
 
     #products.extract()

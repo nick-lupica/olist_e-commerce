@@ -13,7 +13,7 @@ port = os.getenv("port")
 
 def extract():
     print("Questo è il metodo extract dei clienti")
-    df = common.readfile()
+    df = common.read_file()
     return df
 
 def transform(df):

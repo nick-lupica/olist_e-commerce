@@ -12,7 +12,7 @@ user = os.getenv("user")
 password = os.getenv("password")
 port = os.getenv("port")
 
-def readfile():
+def read_file():
     is_valid = False
     df = pd.DataFrame()
     while not is_valid:
