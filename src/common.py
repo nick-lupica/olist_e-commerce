@@ -37,7 +37,7 @@ def read_file():
     else:
         return df
 
-def caricamento_barra(df,cur,sql):
+def loading_bar(df,cur,sql):
     print(f"Caricamento in corso... \n{str(len(df))} righe da inserire.")
     Tmax = 50
     if len(df)/2 < 50:
@@ -131,10 +131,10 @@ def format_region():
 
 
 def save_processed(df):
-    name = input("Inserisci nome del file ").strip().lower()
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
-    file_name = name + "_processed" + "_datetime" + timestamp + ".csv"
-    print(file_name)
+    name = input("What is the name of the file? ").strip().lower()
+    timestamp = datetime.datetime.now().strftime("%Y_%m_%d_%H%M%S")
+    file_name = name + "_processedDateTime_" + timestamp + ".csv"
+    print(file_name, end="\n\n")
     if __name__ == "__main__":
         directory_name = "../data/processed/"
     else:

@@ -1,6 +1,8 @@
 # ETL methods for ORDERS
+
 import pandas as pd
 import src.common as common
+#from src.common import read_file, caricamento_barra
 import psycopg
 from dotenv import load_dotenv
 import os
@@ -14,18 +16,19 @@ password = os.getenv("password")
 port = os.getenv("port")
 
 def extract():
-    print("Questo è il metodo EXTRACT degli ordini")
+    print("---EXTRACT ORDERS--- ")
     df = common.read_file()
     return df
 
 def transform(df):
-    print("Questo è il metodo TRANSFORM degli ordini")
+    print("---TRANSFORM ORDERS---")
     df = common.drop_duplicates(df)
     df = common.check_nulls(df, ["order_id", "customer_id"])
     return df
 
 
 def load(df):
+    print("---LOAD ORDERS---")
     df["last_updated"] = datetime.datetime.now().isoformat(sep=" ", timespec="seconds")
     df["order_purchase_timestamp"] = pd.to_datetime(df["order_purchase_timestamp"])
     df["order_delivered_customer_date"] = pd.to_datetime(df["order_delivered_customer_date"])
@@ -33,7 +36,7 @@ def load(df):
         with conn.cursor() as cur:
 
             sql = """
-                CREATE TABLE IF NOT EXISTS orders (
+                CREATE TABLE orders (
                 pk_order VARCHAR PRIMARY KEY,
                 fk_customer VARCHAR,
                 status VARCHAR,
@@ -41,11 +44,23 @@ def load(df):
                 delivered_timestamp TIMESTAMP,
                 estimated_date DATE,
                 last_updated TIMESTAMP,
-                FOREIGN KEY (fk_customer) REFERENCES customers (pk_customer) 
+                FOREIGN KEY(fk_customer) REFERENCES customers (pk_customer)
                 );
                 """
-
-            cur.execute(sql)
+            try:
+                cur.execute(sql)
+            except psycopg.errors.DuplicateTable as ex:
+                print(ex)
+                conn.commit()
+                delete = input("Do you want to delete table? Y/N ").upper().strip()
+                if delete == "Y":
+                    sql_delete = """ 
+                    DROP TABLE orders CASCADE;
+                    """
+                    cur.execute(sql_delete)
+                    conn.commit()
+                    print("Recreating orders table")
+                    cur.execute(sql)
 
 
             sql = """
@@ -55,14 +70,22 @@ def load(df):
             (fk_customer, status, purchase_timestamp, delivered_timestamp, estimated_date, last_updated) = (EXCLUDED.fk_customer, EXCLUDED.status, EXCLUDED.purchase_timestamp, EXCLUDED.delivered_timestamp, EXCLUDED.estimated_date, EXCLUDED.last_updated)
             """
 
-            common.caricamento_barra(df, cur, sql)
+            common.loading_bar(df, cur, sql)
             conn.commit()
 
+            sql = """
+            UPDATE orders SET delivered_timestamp = null
+            WHERE EXTRACT (YEAR FROM delivered_timestamp) = 48113
+            """
+
+            cur.execute(sql)
+            conn.commit()
+
+
+
 def main():
-    print("Questo è il metodo MAIN degli ordini")
     df = extract()
     df = transform(df)
     load(df)
-
 if __name__ == "__main__": # Indica ciò che viene eseguito quando eseguo direttamente
     main()

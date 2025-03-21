@@ -1,7 +1,9 @@
 import src.customers as customers
 import src.categories as categories
+import src.products as products
 import src.orders as orders
 import src.common as common
+import src.orders_products as orders_products
 
 if __name__ == "__main__":
     risposta = "-1"
@@ -40,8 +42,48 @@ if __name__ == "__main__":
             """)
             if risposta == "1":
                 df_categories = categories.extract()
-                df_categories = categories.load_categories(df_categories)
+                df_categories = categories.transform(df_categories, "product_category_name_english")
                 categories.load(df_categories)
+            else:
+                risposta = "0"
+
+        if domanda_iniziale == "3":
+            risposta = input("""Che cosa vuoi fare con la tabella products?
+            1. Esegui ETL dei products
+            0. Esci dal programma
+            """)
+            if risposta == "1":
+                df_products = products.extract()
+                df_products = products.transform(df_products)
+                df_products = products.raw_load(df_products)
+
+            else:
+                risposta = "0"
+
+        if domanda_iniziale == "4":
+            risposta = input("""Che cosa vuoi fare con la tabella orders?
+            1. Esegui ETL di orders
+            0. Esci dal programma
+            """)
+            if risposta == "1":
+                df_orders = orders.extract()
+                df_orders = orders.transform(df_orders)
+                orders.load(df_orders)
+            else:
+                risposta = "0"
+
+        if domanda_iniziale == "5":
+            risposta = input("""Che cosa vuoi fare con la tabella orders_products?
+            1. Esegui ETL di orders_products
+            2. Elimina valori null con status 'delivered'
+            0. Esci dal programma
+            """)
+            if risposta == "1":
+                df_orders_products = orders_products.extract()
+                df_orders_products = orders_products.transform(df_orders_products)
+                orders_products.load(df_orders_products)
+            elif risposta == "2":
+                orders_products.delete_invalid_order()
             else:
                 risposta = "0"
 

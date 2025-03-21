@@ -22,7 +22,7 @@ def transform(df):
     df = common.check_nulls(df, ["customer_id"])
     df = common.format_string(df, ["region", "city"])
     df = common.format_cap(df)
-    #common.save_processed(df)
+    common.save_processed(df)
     return df
 
 def load(df):
@@ -55,7 +55,7 @@ def load(df):
                 if domanda == "SI":
                     #eliminare tabella
                     sql_delete = """
-                    DROP TABLE customers
+                    DROP TABLE customers CASCADE
                     """
                     cur.execute(sql_delete)
                     print("Tabella customers eliminata.")
@@ -72,7 +72,7 @@ def load(df):
             (region, city, cap, last_updated) = (EXCLUDED.region, EXCLUDED.city, EXCLUDED.cap, EXCLUDED.last_updated);
             """
 
-            common.caricamento_barra(df, cur, sql)
+            common.loading_bar(df, cur, sql)
 
             conn.commit()
 
