@@ -4,6 +4,7 @@ import src.products as products
 import src.orders as orders
 import src.common as common
 import src.orders_products as orders_products
+import src.sellers as sellers
 
 if __name__ == "__main__":
     risposta = "-1"
@@ -14,6 +15,7 @@ if __name__ == "__main__":
         3. products
         4. orders
         5. orders_products
+        6. sellers
         0. esci dal programma
         """)
         if domanda_iniziale == "1":
@@ -87,10 +89,20 @@ if __name__ == "__main__":
             else:
                 risposta = "0"
 
+        if domanda_iniziale == "6":
+            risposta = input("""Che cosa vuoi fare con la tabella sellers?
+            1. Esegui ETL di sellers
+            2. Format nomi regione per PowerBi
+            0. Esci dal programma
+            """)
+            if risposta == "1":
+                df_sellers = sellers.extract()
+                df_sellers = sellers.transform(df_sellers)
+                sellers.load(df_sellers)
+            elif risposta == "2":
+                common.format_region()
+            else:
+                risposta = "0"
+
         if domanda_iniziale == "0":
             risposta = "0"
-
-
-    #products.extract()
-    #products.transform()
-    #products.load()
