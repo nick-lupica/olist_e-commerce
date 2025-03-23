@@ -27,7 +27,7 @@ Tabelle a disposizione:
 * delivered_timestamp TIMESTAMP
 * estimated_date DATE
 
-**sellers** (ancora non disponibile):
+**sellers**:
 * pk_seller VARCHAR
 * region VARCHAR
 
