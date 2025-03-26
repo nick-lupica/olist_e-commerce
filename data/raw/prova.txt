@@ -1,2 +1,0 @@
-customer_id region city cap
-d0615859a639a94c1fe472eba57d4a7c Sicilia Trapani 12900

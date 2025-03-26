@@ -6,6 +6,7 @@ import src.common as common
 import src.orders_products as orders_products
 import src.sellers as sellers
 
+
 if __name__ == "__main__":
     risposta = "-1"
     while risposta != "0":
