@@ -37,20 +37,19 @@ def load(df):
             # cur execute
 
             sql = """
-            CREATE TABLE customers (
-            pk_customer VARCHAR PRIMARY KEY,
-            region VARCHAR,
-            city VARCHAR,
-            cap VARCHAR,
-            last_updated TIMESTAMP
-            );
-            """
+                CREATE TABLE customers (
+                pk_customer VARCHAR PRIMARY KEY,
+                region VARCHAR,
+                city VARCHAR,
+                cap VARCHAR,
+                last_updated TIMESTAMP
+                );
+                """
 
             try:
                 cur.execute(sql)
             except psycopg.errors.DuplicateTable as ex:
                 conn.commit()
-                print(ex)
                 domanda = input("Vuoi cancellare la tabella? Si/No\n ").strip().upper()
                 if domanda == "SI":
                     #eliminare tabella
@@ -66,11 +65,11 @@ def load(df):
             # Inserimento report nel database
 
             sql = """
-            INSERT INTO customers
-            (pk_customer, region, city, cap, last_updated)
-            VALUES (%s, %s, %s, %s, %s) ON CONFLICT (pk_customer) DO UPDATE SET
-            (region, city, cap, last_updated) = (EXCLUDED.region, EXCLUDED.city, EXCLUDED.cap, EXCLUDED.last_updated);
-            """
+                INSERT INTO customers
+                (pk_customer, region, city, cap, last_updated)
+                VALUES (%s, %s, %s, %s, %s) ON CONFLICT (pk_customer) DO UPDATE SET
+                (region, city, cap, last_updated) = (EXCLUDED.region, EXCLUDED.city, EXCLUDED.cap, EXCLUDED.last_updated);
+                """
 
             common.loading_bar(df, cur, sql)
 

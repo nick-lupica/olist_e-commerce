@@ -22,6 +22,7 @@ def transform(df):
     print("TRANSFORM order_products")
     df = common.drop_duplicates(df)
     df = common.check_nulls(df, ["order_id", "product_id", "seller_id"])
+    common.save_processed(df)
     return df
 
 
@@ -55,8 +56,8 @@ def load(df):
                 if domanda == "SI":
                     #eliminare tabella
                     sql_delete = """
-                    DROP TABLE orders_products CASCADE
-                    """
+                        DROP TABLE orders_products CASCADE
+                        """
                     cur.execute(sql_delete)
                     print("Tabella orders_products eliminata.")
                     conn.commit()
@@ -64,13 +65,13 @@ def load(df):
                     cur.execute(sql)
 
             sql = """
-            INSERT INTO orders_products
-            (fk_order, order_item, fk_product, fk_seller, price, freight, last_updated)
-            VALUES (%s, %s, %s, %s, %s, %s, %s) ON CONFLICT (pk_order_product) DO UPDATE SET 
-            (fk_order,order_item, fk_product, fk_seller, price, freight, last_updated) = 
-            (EXCLUDED.fk_order, EXCLUDED.order_item, EXCLUDED.fk_product,
-            EXCLUDED.fk_seller,EXCLUDED.price,EXCLUDED.freight, EXCLUDED.last_updated);
-            """
+                INSERT INTO orders_products
+                (fk_order, order_item, fk_product, fk_seller, price, freight, last_updated)
+                VALUES (%s, %s, %s, %s, %s, %s, %s) ON CONFLICT (pk_order_product) DO UPDATE SET 
+                (fk_order,order_item, fk_product, fk_seller, price, freight, last_updated) = 
+                (EXCLUDED.fk_order, EXCLUDED.order_item, EXCLUDED.fk_product,
+                EXCLUDED.fk_seller,EXCLUDED.price,EXCLUDED.freight, EXCLUDED.last_updated);
+                """
 
             common.loading_bar(df, cur, sql)
             conn.commit()
@@ -79,17 +80,17 @@ def delete_invalid_order():
     with psycopg.connect(host=host, dbname=dbname, user=user, password=password, port=port) as conn:
         with conn.cursor() as cur:
             sql = """
-            DELETE
-            FROM orders_products
-            WHERE fk_order IN (SELECT pk_order FROM orders
-            WHERE orders.delivered_timestamp IS NULL AND orders.status = 'delivered')
-            """
+                DELETE
+                FROM orders_products
+                WHERE fk_order IN (SELECT pk_order FROM orders
+                WHERE orders.delivered_timestamp IS NULL AND orders.status = 'delivered')
+                """
             cur.execute(sql)
             sql = """
-            DELETE 
-            FROM orders
-            WHERE orders.delivered_timestamp IS NULL AND orders.status = 'delivered'
-            """
+                DELETE 
+                FROM orders
+                WHERE orders.delivered_timestamp IS NULL AND orders.status = 'delivered'
+                """
             cur.execute(sql)
             conn.commit()
 

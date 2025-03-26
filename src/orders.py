@@ -52,40 +52,39 @@ def load(df):
             except psycopg.errors.DuplicateTable as ex:
                 print(ex)
                 conn.commit()
-                delete = input("Do you want to delete table? Y/N ").upper().strip()
-                if delete == "Y":
+                domanda = input("Vuoi cancellare la tabella? Si/No \n").strip().upper()
+                if domanda == "SI":
                     sql_delete = """ 
-                    DROP TABLE orders CASCADE;
-                    """
+                        DROP TABLE orders CASCADE;
+                        """
                     cur.execute(sql_delete)
                     conn.commit()
-                    print("Recreating orders table")
+                    print("Ricreo la tabella orders")
                     cur.execute(sql)
 
 
             sql = """
-            INSERT INTO orders
-            (pk_order, fk_customer, status, purchase_timestamp, delivered_timestamp, estimated_date, last_updated)
-            VALUES (%s, %s, %s, %s, %s, %s, %s) ON CONFLICT (pk_order) DO UPDATE SET 
-            (fk_customer, status, purchase_timestamp, delivered_timestamp, estimated_date, last_updated) = (EXCLUDED.fk_customer, EXCLUDED.status, EXCLUDED.purchase_timestamp, EXCLUDED.delivered_timestamp, EXCLUDED.estimated_date, EXCLUDED.last_updated)
-            """
+                INSERT INTO orders
+                (pk_order, fk_customer, status, purchase_timestamp, delivered_timestamp, estimated_date, last_updated)
+                VALUES (%s, %s, %s, %s, %s, %s, %s) ON CONFLICT (pk_order) DO UPDATE SET 
+                (fk_customer, status, purchase_timestamp, delivered_timestamp, estimated_date, last_updated) = (EXCLUDED.fk_customer, EXCLUDED.status, EXCLUDED.purchase_timestamp, EXCLUDED.delivered_timestamp, EXCLUDED.estimated_date, EXCLUDED.last_updated)
+                """
 
             common.loading_bar(df, cur, sql)
             conn.commit()
 
             sql = """
-            UPDATE orders SET delivered_timestamp = null
-            WHERE EXTRACT (YEAR FROM delivered_timestamp) = 48113
-            """
+                UPDATE orders SET delivered_timestamp = null
+                WHERE EXTRACT (YEAR FROM delivered_timestamp) = 48113
+                """
 
             cur.execute(sql)
             conn.commit()
-
-
 
 def main():
     df = extract()
     df = transform(df)
     load(df)
-if __name__ == "__main__": # Indica ciò che viene eseguito quando eseguo direttamente
+
+if __name__ == "__main__":
     main()

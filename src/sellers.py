@@ -36,12 +36,12 @@ def load(df):
             # cur execute
 
             sql = """
-            CREATE TABLE sellers (
-            pk_seller VARCHAR PRIMARY KEY,
-            region VARCHAR,
-            last_updated TIMESTAMP
-            );
-            """
+                CREATE TABLE sellers (
+                pk_seller VARCHAR PRIMARY KEY,
+                region VARCHAR,
+                last_updated TIMESTAMP
+                );
+                """
 
             try:
                 cur.execute(sql)
@@ -52,8 +52,8 @@ def load(df):
                 if domanda == "SI":
                     #eliminare tabella
                     sql_delete = """
-                    DROP TABLE sellers CASCADE
-                    """
+                        DROP TABLE sellers CASCADE
+                        """
                     cur.execute(sql_delete)
                     print("Tabella sellers eliminata.")
                     conn.commit()
@@ -63,11 +63,11 @@ def load(df):
             # Inserimento report nel database
 
             sql = """
-            INSERT INTO sellers
-            (pk_seller, region, last_updated)
-            VALUES (%s, %s, %s) ON CONFLICT (pk_seller) DO UPDATE SET
-            (region, last_updated) = (EXCLUDED.region, EXCLUDED.last_updated);
-            """
+                INSERT INTO sellers
+                (pk_seller, region, last_updated)
+                VALUES (%s, %s, %s) ON CONFLICT (pk_seller) DO UPDATE SET
+                (region, last_updated) = (EXCLUDED.region, EXCLUDED.last_updated);
+                """
 
             common.loading_bar(df, cur, sql)
 

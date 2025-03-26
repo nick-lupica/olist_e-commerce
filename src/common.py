@@ -1,5 +1,4 @@
 import datetime
-import numpy as np
 import psycopg
 import os
 from dotenv import load_dotenv
@@ -76,7 +75,6 @@ def check_nulls(df, subset = ""):
     print(f"Valori nulli per colonna:\n {df.isnull().sum()} \n")
     subset = df.columns.tolist()[0] if not subset else subset
     df.dropna(subset=subset, inplace=True, ignore_index=True)
-    #df = fill_nulls(df)
     return df
 
 def fill_nulls(df):
@@ -94,11 +92,11 @@ def format_region():
 
         with conn.cursor() as cur:
             sql = f"""
-            UPDATE {nome_tabella}
-            SET region = 'Emilia-Romagna'
-            WHERE region = 'Emilia Romagna'
-            RETURNING *            
-            """
+                UPDATE {nome_tabella}
+                SET region = 'Emilia-Romagna'
+                WHERE region = 'Emilia Romagna'
+                RETURNING *            
+                """
 
             cur.execute(sql)
             print("record con regione aggiornata")
@@ -106,11 +104,11 @@ def format_region():
                 print(record)
 
             sql = f"""
-            UPDATE {nome_tabella}
-            SET region = 'Friuli-Venezia Giulia'
-            WHERE region = 'Friuli Venezia Giulia'
-            RETURNING *            
-            """
+                UPDATE {nome_tabella}
+                SET region = 'Friuli-Venezia Giulia'
+                WHERE region = 'Friuli Venezia Giulia'
+                RETURNING *            
+                """
 
             cur.execute(sql)
             print("record con regione aggiornata")
@@ -118,11 +116,11 @@ def format_region():
                 print(record)
 
             sql = f"""
-            UPDATE {nome_tabella}
-            SET region = 'Trentino-Alto Adige'
-            WHERE region = 'Trentino Alto Adige'
-            RETURNING *            
-            """
+                UPDATE {nome_tabella}
+                SET region = 'Trentino-Alto Adige'
+                WHERE region = 'Trentino Alto Adige'
+                RETURNING *            
+                """
 
             cur.execute(sql)
             print("record con regione aggiornata")

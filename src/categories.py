@@ -27,43 +27,41 @@ def load_categories(df):
     with psycopg.connect(host=host, dbname=dbname, user=user, password=password, port=port) as conn:
         with conn.cursor() as cur:
             sql = """   
-            CREATE TABLE categories (
-            pk_category SERIAL PRIMARY KEY,
-            category_name VARCHAR UNIQUE,
-            last_updated TIMESTAMP
-            );
-            """
+                CREATE TABLE categories (
+                pk_category SERIAL PRIMARY KEY,
+                category_name VARCHAR UNIQUE,
+                last_updated TIMESTAMP
+                );
+                """
             try:
                 cur.execute(sql)
                 sql = f"""
-                INSERT INTO categories (category_name, last_updated) 
-                VALUES ('other','{datetime.datetime.now().isoformat(sep=" ", timespec="seconds")}')
-                """
+                    INSERT INTO categories (category_name, last_updated) 
+                    VALUES ('other','{datetime.datetime.now().isoformat(sep=" ", timespec="seconds")}')
+                    """
                 cur.execute(sql)
 
             except psycopg.errors.DuplicateTable as ex:
                 print(f"ERROR: {ex}")
                 conn.commit()
-                delete = input("Do you want to delete table? Y/N ").upper().strip()
-                if delete == "Y":
-                    sql_delete = """ 
-                    DROP TABLE categories CASCADE;
-                    """
+                domanda = input("Vuoi cancellare la tabella? Si/No\n ").strip().upper()
+                if domanda == "SI":
+                    # eliminare tabella
+                    sql_delete = """
+                        DROP TABLE categories CASCADE
+                        """
                     cur.execute(sql_delete)
+                    print("Tabella categories eliminata.")
                     conn.commit()
-                    print("Recreating categories table")
+                    print("Ricreo la tabella categories.")
                     cur.execute(sql)
-                    sql = f"""
-                     INSERT INTO categories (category_name, last_updated) 
-                     VALUES ('other','{datetime.datetime.now().isoformat(sep=" ", timespec="seconds")}')
-                    """
-                    cur.execute(sql)
+
             sql = """
-            INSERT INTO categories (category_name, last_updated) 
-            VALUES (%s, %s)
-            ON CONFLICT (category_name) DO UPDATE 
-            SET  last_updated = EXCLUDED.last_updated  ;
-            """
+                INSERT INTO categories (category_name, last_updated) 
+                VALUES (%s, %s)
+                ON CONFLICT (category_name) DO UPDATE 
+                SET  last_updated = EXCLUDED.last_updated;
+                """
             common.loading_bar(df, cur, sql)
             conn.commit()
 

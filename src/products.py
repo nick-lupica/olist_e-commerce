@@ -38,14 +38,14 @@ def raw_load(df):
     with psycopg.connect(host=host, dbname=dbname, user=user, password=password, port=port) as conn:
         with conn.cursor() as cur:
             sql = """
-            CREATE TABLE IF NOT EXISTS products (
-            pk_product VARCHAR PRIMARY KEY,
-            fk_category VARCHAR,
-            name_length INTEGER,
-            description_length INTEGER,
-            imgs_qty INTEGER
-            );
-            """
+                CREATE TABLE IF NOT EXISTS products (
+                pk_product VARCHAR PRIMARY KEY,
+                fk_category VARCHAR,
+                name_length INTEGER,
+                description_length INTEGER,
+                imgs_qty INTEGER
+                );
+                """
 
             cur.execute(sql)
             print("Sto inserendo le categories come stringhe")
@@ -54,7 +54,8 @@ def raw_load(df):
                 (pk_product, fk_category,name_length, description_length, imgs_qty)
                 VALUES (%s, %s, %s, %s, %s) ON CONFLICT (pk_product) DO UPDATE SET 
                 (fk_category,name_length, description_length, imgs_qty) = (EXCLUDED.fk_category,
-                EXCLUDED.name_length,  EXCLUDED.description_length, EXCLUDED.imgs_qty);
+                EXCLUDED.name_length,  EXCLUDED.description_length, EXCLUDED.imgs_qty
+                );
                 """
 
             common.loading_bar(df, cur, sql)
@@ -64,7 +65,6 @@ def raw_load(df):
             # query useful for creating a new df
             sql = """ SELECT * from products;"""
             cur.execute(sql)
-            #rows = cur.fetchall()
             # creo df
             df_update = pd.DataFrame(cur, columns=["pk_product", "fk_category","name_length", "description_length", "imgs_qty"])
             df_update["last_updated"] = datetime.datetime.now().isoformat(sep=" ", timespec="seconds")
@@ -76,26 +76,27 @@ def raw_load(df):
             print("Ricreo tabella products")
 
             sql = """
-                        CREATE TABLE IF NOT EXISTS products (
-                        pk_product VARCHAR PRIMARY KEY,
-                        fk_category INTEGER,
-                        name_length INTEGER,
-                        description_length INTEGER,
-                        imgs_qty INTEGER,
-                        last_updated TIMESTAMP,
-                        FOREIGN KEY (fk_category) REFERENCES categories (pk_category)
-                        );
-                        """
+                CREATE TABLE IF NOT EXISTS products (
+                pk_product VARCHAR PRIMARY KEY,
+                fk_category INTEGER,
+                name_length INTEGER,
+                description_length INTEGER,
+                imgs_qty INTEGER,
+                last_updated TIMESTAMP,
+                FOREIGN KEY (fk_category) REFERENCES categories (pk_category)
+                );
+                """
 
             cur.execute(sql)
 
             sql = """
-                            INSERT INTO products
-                            (pk_product, fk_category,name_length, description_length, imgs_qty, last_updated)
-                            VALUES (%s, %s, %s, %s, %s, %s) ON CONFLICT (pk_product) DO UPDATE SET 
-                            (fk_category,name_length, description_length, imgs_qty, last_updated) = (EXCLUDED.fk_category,
-                            EXCLUDED.name_length,  EXCLUDED.description_length, EXCLUDED.imgs_qty, EXCLUDED.last_updated);
-                            """
+                INSERT INTO products
+                (pk_product, fk_category,name_length, description_length, imgs_qty, last_updated)
+                VALUES (%s, %s, %s, %s, %s, %s) ON CONFLICT (pk_product) DO UPDATE SET 
+                (fk_category,name_length, description_length, imgs_qty, last_updated) = (EXCLUDED.fk_category,
+                EXCLUDED.name_length,  EXCLUDED.description_length, EXCLUDED.imgs_qty, EXCLUDED.last_updated
+                );
+                """
 
             common.loading_bar(df_update, cur, sql)
 
@@ -109,15 +110,15 @@ def change_category():
     with psycopg.connect(host=host, dbname=dbname, user=user, password=password, port=port) as conn:
         with conn.cursor() as cur:
             sql = f"""
-                          UPDATE products AS  p
-                          SET fk_category = c.pk_category
-                          FROM categories AS c 
-                          WHERE p.fk_category = c.category_name 
-                          RETURNING *;
-                         """
+                UPDATE products AS  p
+                SET fk_category = c.pk_category
+                FROM categories AS c 
+                WHERE p.fk_category = c.category_name 
+                RETURNING *;
+                """
 
             cur.execute(sql)
-            #updated_records = cur.fetchall()
+
             for record in cur:
                 print(record)
             conn.commit()
@@ -128,12 +129,12 @@ def null_categories():
     with psycopg.connect(host=host, dbname=dbname, user=user, password=password, port=port) as conn:
         with conn.cursor() as cur:
             sql = f"""
-                          UPDATE products AS  p
-                          SET fk_category = c.pk_category
-                          FROM categories AS c 
-                          WHERE fk_category IS NULL 
-                          RETURNING *;
-                         """
+                UPDATE products AS  p
+                SET fk_category = c.pk_category
+                FROM categories AS c 
+                WHERE fk_category IS NULL 
+                RETURNING *;
+                """
 
             cur.execute(sql)
             #updated_records = cur.fetchall()
@@ -173,19 +174,21 @@ def load(df):
                 delete = input("Do you want to delete table? Y/N ").upper().strip()
                 if delete == "Y":
                     sql_delete = """ 
-                    DROP TABLE products CASCADE;
-                    """
+                        DROP TABLE products CASCADE;
+                        """
                     cur.execute(sql_delete)
                     conn.commit()
                     print("Recreating products table")
                     cur.execute(sql)
+
             sql = """
-                   INSERT INTO products
-                   (pk_product, fk_category,name_length, description_length, imgs_qty, last_updated)
-                   VALUES (%s, %s, %s, %s, %s, %s) ON CONFLICT (pk_product) DO UPDATE SET 
-                   (fk_category,name_length, description_length, imgs_qty, last_updated) = (EXCLUDED.fk_category,
-                   EXCLUDED.name_length, EXCLUDED.description_length, EXCLUDED.imgs_qty, EXCLUDED.last_updated);
-                   """
+                INSERT INTO products
+                (pk_product, fk_category,name_length, description_length, imgs_qty, last_updated)
+                VALUES (%s, %s, %s, %s, %s, %s) ON CONFLICT (pk_product) DO UPDATE SET 
+                (fk_category,name_length, description_length, imgs_qty, last_updated) = (EXCLUDED.fk_category,
+                EXCLUDED.name_length, EXCLUDED.description_length, EXCLUDED.imgs_qty, EXCLUDED.last_updated
+                );
+                """
 
             common.loading_bar(df, cur, sql)
             conn.commit()
