@@ -23,10 +23,10 @@ def extract():
 
 def convert_numbers(df):
     colonne_da_convertire = ['product_name_lenght', 'product_description_lenght', 'product_photos_qty']
-    df[colonne_da_convertire] = df[colonne_da_convertire].apply(lambda x: x.astype(str))
-    df[colonne_da_convertire] = df[colonne_da_convertire].apply(lambda x: x.str.replace("nan", "0"))
-    df[colonne_da_convertire] = df[colonne_da_convertire].apply(lambda x: x.str.replace(".0", ""))
-    df[colonne_da_convertire] = df[colonne_da_convertire].apply(lambda x: x.astype(int))
+    df[colonne_da_convertire] = df[colonne_da_convertire].apply(
+        lambda x: x.astype(str).str.replace("nan", "0").str.replace(".0", "").astype(int)
+    )
+
     return df
 
 
